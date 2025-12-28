@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   },
   tableColLast: {
     paddingRight: 0,
+    textAlign: "right",
   },
   tableHeader: {
     fontWeight: "medium",
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     width: "4%",
   },
   lineItemDescription: {
-    width: "56%",
+    width: "50%",
   },
   lineItemQuantity: {
     width: "10%",
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   lineItemTotal: {
-    width: "10%",
+    width: "30%",
     textAlign: "right",
   },
   lineItemTax: {
@@ -175,7 +176,7 @@ const InvoicePDF = ({
   invoice,
   client,
   organization,
-  taxRates,
+  // taxRates,
   i18n,
 }: {
   invoice: any;
@@ -186,31 +187,31 @@ const InvoicePDF = ({
 }) => {
   const dateFormat = organization?.date_format;
   // Group line items by tax rate and calculate tax for each group
-  const taxGroups = (() => {
-    const groups: { [key: string]: { taxRate: any; items: any[]; subtotal: number; tax: number } } = {};
+  // const taxGroups = (() => {
+  //   const groups: { [key: string]: { taxRate: any; items: any[]; subtotal: number; tax: number } } = {};
 
-    invoice.lineItems?.forEach((item: any) => {
-      if (item.total) {
-        const taxRateId = item.taxRate || "no-tax";
-        const taxRate = item.taxRate ? taxRates?.find((rate: any) => rate.id === taxRateId) : null;
+  //   invoice.lineItems?.forEach((item: any) => {
+  //     if (item.total) {
+  //       const taxRateId = item.taxRate || "no-tax";
+  //       const taxRate = item.taxRate ? taxRates?.find((rate: any) => rate.id === taxRateId) : null;
 
-        if (!groups[taxRateId]) {
-          groups[taxRateId] = {
-            taxRate,
-            items: [],
-            subtotal: 0,
-            tax: 0,
-          };
-        }
+  //       if (!groups[taxRateId]) {
+  //         groups[taxRateId] = {
+  //           taxRate,
+  //           items: [],
+  //           subtotal: 0,
+  //           tax: 0,
+  //         };
+  //       }
 
-        groups[taxRateId].items.push(item);
-        groups[taxRateId].subtotal += item.total;
-        groups[taxRateId].tax = taxRate?.percentage ? (groups[taxRateId].subtotal * taxRate.percentage) / 100 : 0;
-      }
-    });
+  //       groups[taxRateId].items.push(item);
+  //       groups[taxRateId].subtotal += item.total;
+  //       groups[taxRateId].tax = taxRate?.percentage ? (groups[taxRateId].subtotal * taxRate.percentage) / 100 : 0;
+  //     }
+  //   });
 
-    return Object.values(groups);
-  })();
+  //   return Object.values(groups);
+  // })();
   return (
     <I18nProvider i18n={i18n}>
       <Document>
@@ -290,15 +291,15 @@ const InvoicePDF = ({
               <Text style={[styles.tableCol, styles.lineItemUnitPrice]}>
                 <Trans>Price</Trans>
               </Text>
-              <Text style={[styles.tableCol, styles.lineItemTax]}>
+              {/* <Text style={[styles.tableCol, styles.lineItemTax]}>
                 <Trans>Tax %</Trans>
-              </Text>
+              </Text> */}
               <Text style={[styles.tableCol, styles.tableColLast, styles.lineItemTotal]}>
                 <Trans>Total</Trans>
               </Text>
             </View>
             {invoice.lineItems?.map((lineItem: any, index: number) => {
-              const taxRate = taxRates?.find((rate: any) => rate.id === lineItem.taxRate);
+              // const taxRate = taxRates?.find((rate: any) => rate.id === lineItem.taxRate);
               const isLastItem = index === invoice.lineItems.length - 1;
               return (
                 <View
@@ -315,7 +316,7 @@ const InvoicePDF = ({
                   <Text style={[styles.tableCol, styles.lineItemUnitPrice]}>
                     {getFormattedNumber(lineItem.unitPrice, invoice.currency, i18n.locale, organization)}
                   </Text>
-                  <Text style={[styles.tableCol, styles.lineItemTax]}>{taxRate ? `${taxRate.percentage}%` : ""}</Text>
+                  {/* <Text style={[styles.tableCol, styles.lineItemTax]}>{taxRate ? `${taxRate.percentage}%` : ""}</Text> */}
                   <Text style={[styles.tableCol, styles.tableColLast, styles.lineItemTotal]}>
                     {getFormattedNumber(lineItem.total, invoice.currency, i18n.locale, organization)}
                   </Text>
@@ -338,7 +339,7 @@ const InvoicePDF = ({
                     {getFormattedNumber(invoice.subTotal, invoice.currency, i18n.locale, organization)}
                   </Text>
                 </View>
-                {taxGroups.map((group, index) => (
+                {/* {taxGroups.map((group, index) => (
                   <View
                     key={`tax-${index}`}
                     style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 4 }}
@@ -350,7 +351,7 @@ const InvoicePDF = ({
                       {getFormattedNumber(group.tax, invoice.currency, i18n.locale, organization)}
                     </Text>
                   </View>
-                ))}
+                ))} */}
               </View>
               <View
                 style={{

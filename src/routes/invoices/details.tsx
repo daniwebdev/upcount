@@ -804,7 +804,7 @@ const InvoiceDetails: React.FC = () => {
                                 </Form.Item>
                               )}
                             />
-                            <Table.Column
+                            {/* <Table.Column
                               title={t`Tax %`}
                               key="taxRate"
                               width={120}
@@ -821,7 +821,7 @@ const InvoiceDetails: React.FC = () => {
                                   </Select>
                                 </Form.Item>
                               )}
-                            />
+                            /> */}
                             <Table.Column
                               title={t`Total`}
                               key="total"
@@ -928,7 +928,7 @@ const InvoiceDetails: React.FC = () => {
                       minimumFractionDigits: organization.minimum_fraction_digits,
                     }).format(subTotal)}
                   </Descriptions.Item>
-                  {taxGroups.length > 0 ? (
+                  {/* {taxGroups.length > 0 ? (
                     taxGroups.map((group) => (
                       <Descriptions.Item
                         key={group.taxRate?.id}
@@ -949,7 +949,7 @@ const InvoiceDetails: React.FC = () => {
                         minimumFractionDigits: organization.minimum_fraction_digits,
                       }).format(0)}
                     </Descriptions.Item>
-                  )}
+                  )} */}
                   <Descriptions.Item
                     label={
                       <strong>

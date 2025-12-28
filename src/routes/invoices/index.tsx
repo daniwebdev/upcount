@@ -18,6 +18,7 @@ import { organizationAtom } from "src/atoms/organization";
 import { getFormattedNumber } from "src/utils/currencies";
 import { useDateFormatter } from "src/utils/date";
 import InvoiceStateSelect from "src/components/invoices/state-select";
+import InvoiceSummary from "src/components/invoices/card-summary";
 
 const { Title } = Typography;
 
@@ -193,6 +194,8 @@ const Invoices = () => {
           )}
         />
       </Table>
+
+      <InvoiceSummary dataSources={search ? searchInvoices() : invoices} />
     </>
   );
 };
