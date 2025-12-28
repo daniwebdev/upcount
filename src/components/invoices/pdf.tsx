@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { I18nProvider } from "@lingui/react";
 import { Document, Font, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
+import parse from 'html-react-parser';
 
 import { getFormattedNumber } from "src/utils/currencies";
 import { formatDate } from "src/utils/date";
@@ -56,6 +57,11 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Montserrat",
     fontSize: 24,
+    fontWeight: "semibold",
+  },
+  invoiceNumber: {
+fontFamily: "Montserrat",
+    fontSize: 16,
     fontWeight: "semibold",
   },
   subtitle: {
@@ -172,6 +178,17 @@ const styles = StyleSheet.create({
   },
 });
 
+
+const renderNode = (node: any, index: any) => {
+  if (node.type === 'tag' && node.name === 'b') {
+    return <Text key={index} style={{ fontWeight: 'bold' }}>
+      {node.children[0].data}
+    </Text>;
+  }
+  return node.data;
+};
+
+
 const InvoicePDF = ({
   invoice,
   client,
@@ -221,7 +238,10 @@ const InvoicePDF = ({
           <View style={styles.row}>
             <View style={styles.column}>
               <Text style={styles.title}>
-                <Trans>Invoice {invoice.number}</Trans>
+                <Trans>Invoice</Trans>
+              </Text>
+              <Text style={styles.invoiceNumber}>
+                {invoice.number}
               </Text>
             </View>
             <View style={[styles.column]}>
@@ -232,7 +252,7 @@ const InvoicePDF = ({
           <View style={styles.row}>
             <View style={styles.column}>
               <Text style={[styles.subtitle]}>{client.name}</Text>
-              <Text style={styles.smallText}>{client.address}</Text>
+              <Text style={styles.smallText}>{parse(client.address, {replace: renderNode})}</Text>
               {client.emails && (() => {
                 // Handle both string (JSON) and array formats
                 let emailsArray: string[] = [];
