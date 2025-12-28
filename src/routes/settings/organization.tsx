@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Popconfirm, Space, Typography, Row, Select, Divider } from "antd";
+import { Button, Col, Form, Input, Popconfirm, Space, Typography, Row, Select, Divider, Switch } from "antd";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { HomeOutlined } from "@ant-design/icons";
 import { Trans } from "@lingui/react/macro";
@@ -24,9 +24,15 @@ function SettingsInvoice() {
   const [organization, setOrganization] = useAtom(organizationAtom);
   const [submitting, setSubmitting] = useAtom(submittingAtom);
 
-  const onSubmit = async (values: object) => {
+  const initialValues = organization
+    ? { ...organization, taxesEnabled: organization.taxesEnabled === 0 ? false : !!organization.taxesEnabled }
+    : undefined;
+
+  const onSubmit = async (values: any) => {
     setSubmitting(true);
-    setOrganization(values);
+    // convert boolean to integer expected by backend (1 = enabled, 0 = disabled)
+    const payload = { ...values, taxesEnabled: values.taxesEnabled ? 1 : 0 };
+    setOrganization(payload);
     setOrganizations();
     setSubmitting(false);
   };
@@ -38,8 +44,8 @@ function SettingsInvoice() {
 
   return (
     <>
-      {!isEmpty(organization) && (
-        <Form form={form} layout="vertical" onFinish={onSubmit} initialValues={organization}>
+          {!isEmpty(organization) && (
+        <Form form={form} layout="vertical" onFinish={onSubmit} initialValues={initialValues}>
           <Row style={{ backgroundColor: "#fff" }}>
             <Col span={24}>
               <Title level={3} style={{ marginTop: 0 }}>
@@ -114,6 +120,13 @@ function SettingsInvoice() {
               </Divider>
             </Col>
           </Row>
+              <Row>
+                <Col span={12}>
+                  <Form.Item label={t`Enable taxes`} name="taxesEnabled" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </Col>
+              </Row>
           <Row>
             <Col span={12}>
               <Row gutter={16}>

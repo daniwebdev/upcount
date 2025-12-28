@@ -29,6 +29,9 @@ pub struct Organization {
     #[sqlx(rename = "createdAt")]
     pub created_at: Option<String>,
     pub logo: Option<Vec<u8>>,
+    #[serde(rename = "taxesEnabled")]
+    #[sqlx(rename = "taxes_enabled")]
+    pub taxes_enabled: Option<i64>,
     #[serde(rename = "invoiceNumberFormat")]
     #[sqlx(rename = "invoice_number_format")]
     pub invoice_number_format: Option<String>,
@@ -59,6 +62,8 @@ pub struct CreateOrganizationRequest {
     #[serde(rename = "customerNotes")]
     pub customer_notes: Option<String>,
     pub logo: Option<Vec<u8>>,
+    #[serde(rename = "taxesEnabled")]
+    pub taxes_enabled: Option<i64>,
     #[serde(rename = "invoiceNumberFormat")]
     pub invoice_number_format: Option<String>,
     pub date_format: Option<String>,
@@ -84,6 +89,8 @@ pub struct UpdateOrganizationRequest {
     #[serde(rename = "customerNotes")]
     pub customer_notes: Option<String>,
     pub logo: Option<Vec<u8>>,
+    #[serde(rename = "taxesEnabled")]
+    pub taxes_enabled: Option<i64>,
     #[serde(rename = "invoiceNumberFormat")]
     pub invoice_number_format: Option<String>,
     #[serde(rename = "invoiceNumberCounter")]
@@ -125,9 +132,9 @@ impl Database {
                 id, name, country, address, email, phone, website, 
                 registration_number, vatin, bank_name, iban, currency,
                 minimum_fraction_digits, due_days, overdueCharge, 
-                customerNotes, logo, invoice_number_format, date_format
+                customerNotes, logo, taxes_enabled, invoice_number_format, date_format
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(&organization.id)
@@ -147,6 +154,7 @@ impl Database {
         .bind(&organization.overdue_charge)
         .bind(&organization.customer_notes)
         .bind(&organization.logo)
+        .bind(&organization.taxes_enabled)
         .bind(&organization.invoice_number_format)
         .bind(&organization.date_format)
         .execute(&self.pool)
@@ -179,6 +187,7 @@ impl Database {
                 due_days = COALESCE(?, due_days),
                 overdueCharge = COALESCE(?, overdueCharge),
                 customerNotes = COALESCE(?, customerNotes),
+                taxes_enabled = COALESCE(?, taxes_enabled),
                 logo = COALESCE(?, logo),
                 invoice_number_format = COALESCE(?, invoice_number_format),
                 invoice_number_counter = COALESCE(?, invoice_number_counter),
@@ -201,6 +210,7 @@ impl Database {
         .bind(&updates.due_days)
         .bind(&updates.overdue_charge)
         .bind(&updates.customer_notes)
+        .bind(&updates.taxes_enabled)
         .bind(&updates.logo)
         .bind(&updates.invoice_number_format)
         .bind(&updates.invoice_number_counter)

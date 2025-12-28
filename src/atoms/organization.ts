@@ -75,6 +75,7 @@ export const organizationAtom = atom(
           minimum_fraction_digits: 2,
           due_days: 7,
           overdueCharge: 0,
+          taxesEnabled: 1,
           invoiceNumberFormat: "#{number}",
           invoiceNumberCounter: 0,
           ...processedValues, // User values override defaults

@@ -175,6 +175,16 @@ const Invoices = () => {
           sorter={(a: any, b: any) => a.total - b.total}
           render={(total, invoice: any) => getFormattedNumber(total, invoice.currency, i18n.locale, organization)}
         />
+        {organization?.taxesEnabled !== 0 && (
+          <Table.Column
+            title={<Trans>Tax</Trans>}
+            dataIndex="taxTotal"
+            key="taxTotal"
+            align="right"
+            sorter={(a: any, b: any) => (a.taxTotal || 0) - (b.taxTotal || 0)}
+            render={(taxTotal, invoice: any) => getFormattedNumber(taxTotal || 0, invoice.currency, i18n.locale, organization)}
+          />
+        )}
         <Table.Column
           title={<Trans>State</Trans>}
           key="state"

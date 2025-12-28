@@ -486,6 +486,11 @@ const InvoiceDetails: React.FC = () => {
   );
   // Group line items by tax rate and calculate tax for each group
   const taxGroups = useMemo(() => {
+    // If taxes are disabled for the organization, return no tax groups
+    if (organization?.taxesEnabled === 0) {
+      return [];
+    }
+
     const groups: { [key: string]: { taxRate: any; items: any[]; subtotal: number; tax: number } } = {};
 
     if (lineItems && Array.isArray(lineItems)) {
@@ -513,7 +518,7 @@ const InvoiceDetails: React.FC = () => {
     }
 
     return Object.values(groups);
-  }, [lineItems, taxRates]);
+  }, [lineItems, taxRates, organization]);
 
   const taxTotal = sum(map(taxGroups, "tax"));
   const total = addDecimal(subTotal, taxTotal);
@@ -804,24 +809,26 @@ const InvoiceDetails: React.FC = () => {
                                 </Form.Item>
                               )}
                             />
-                            {/* <Table.Column
-                              title={t`Tax %`}
-                              key="taxRate"
-                              width={120}
-                              render={(field) => (
-                                <Form.Item name={[field.name, "taxRate"]} noStyle>
-                                  <Select style={{ width: "100%" }} allowClear placeholder="Select tax">
-                                    {map(taxRates, (rate: any) => {
-                                      return (
-                                        <Option value={rate.id} key={rate.id}>
-                                          {rate.name} {rate.percentage}%
-                                        </Option>
-                                      );
-                                    })}
-                                  </Select>
-                                </Form.Item>
-                              )}
-                            /> */}
+                            {organization?.taxesEnabled !== 0 && (
+                              <Table.Column
+                                title={t`Tax %`}
+                                key="taxRate"
+                                width={120}
+                                render={(field) => (
+                                  <Form.Item name={[field.name, "taxRate"]} noStyle>
+                                    <Select style={{ width: "100%" }} allowClear placeholder="Select tax">
+                                      {map(taxRates, (rate: any) => {
+                                        return (
+                                          <Option value={rate.id} key={rate.id}>
+                                            {rate.name} {rate.percentage}%
+                                          </Option>
+                                        );
+                                      })}
+                                    </Select>
+                                  </Form.Item>
+                                )}
+                              />
+                            )}
                             <Table.Column
                               title={t`Total`}
                               key="total"
@@ -928,28 +935,30 @@ const InvoiceDetails: React.FC = () => {
                       minimumFractionDigits: organization.minimum_fraction_digits,
                     }).format(subTotal)}
                   </Descriptions.Item>
-                  {/* {taxGroups.length > 0 ? (
-                    taxGroups.map((group) => (
-                      <Descriptions.Item
-                        key={group.taxRate?.id}
-                        label={`${group.taxRate?.name || "Tax"} ${group.taxRate?.percentage || 0}%`}
-                      >
+                  {organization?.taxesEnabled !== 0 && (
+                    taxGroups.length > 0 ? (
+                      taxGroups.map((group) => (
+                        <Descriptions.Item
+                          key={group.taxRate?.id}
+                          label={`${group.taxRate?.name || "Tax"} ${group.taxRate?.percentage || 0}%`}
+                        >
+                          {Intl.NumberFormat(i18n.locale, {
+                            style: "currency",
+                            currency: organization.currency,
+                            minimumFractionDigits: organization.minimum_fraction_digits,
+                          }).format(group.tax)}
+                        </Descriptions.Item>
+                      ))
+                    ) : (
+                      <Descriptions.Item label={<Trans>Tax</Trans>}>
                         {Intl.NumberFormat(i18n.locale, {
                           style: "currency",
                           currency: organization.currency,
                           minimumFractionDigits: organization.minimum_fraction_digits,
-                        }).format(group.tax)}
+                        }).format(0)}
                       </Descriptions.Item>
-                    ))
-                  ) : (
-                    <Descriptions.Item label={<Trans>Tax</Trans>}>
-                      {Intl.NumberFormat(i18n.locale, {
-                        style: "currency",
-                        currency: organization.currency,
-                        minimumFractionDigits: organization.minimum_fraction_digits,
-                      }).format(0)}
-                    </Descriptions.Item>
-                  )} */}
+                    )
+                  )}
                   <Descriptions.Item
                     label={
                       <strong>

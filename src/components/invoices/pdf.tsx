@@ -176,7 +176,7 @@ const InvoicePDF = ({
   invoice,
   client,
   organization,
-  // taxRates,
+  taxRates,
   i18n,
 }: {
   invoice: any;
@@ -186,32 +186,34 @@ const InvoicePDF = ({
   i18n: any;
 }) => {
   const dateFormat = organization?.date_format;
-  // Group line items by tax rate and calculate tax for each group
-  // const taxGroups = (() => {
-  //   const groups: { [key: string]: { taxRate: any; items: any[]; subtotal: number; tax: number } } = {};
+  // Group line items by tax rate and calculate tax for each group only when taxes are enabled
+  const taxGroups = organization?.taxesEnabled === 0
+    ? []
+    : (() => {
+        const groups: { [key: string]: { taxRate: any; items: any[]; subtotal: number; tax: number } } = {};
 
-  //   invoice.lineItems?.forEach((item: any) => {
-  //     if (item.total) {
-  //       const taxRateId = item.taxRate || "no-tax";
-  //       const taxRate = item.taxRate ? taxRates?.find((rate: any) => rate.id === taxRateId) : null;
+        invoice.lineItems?.forEach((item: any) => {
+          if (item.total) {
+            const taxRateId = item.taxRate || "no-tax";
+            const taxRate = item.taxRate ? taxRates?.find((rate: any) => rate.id === taxRateId) : null;
 
-  //       if (!groups[taxRateId]) {
-  //         groups[taxRateId] = {
-  //           taxRate,
-  //           items: [],
-  //           subtotal: 0,
-  //           tax: 0,
-  //         };
-  //       }
+            if (!groups[taxRateId]) {
+              groups[taxRateId] = {
+                taxRate,
+                items: [],
+                subtotal: 0,
+                tax: 0,
+              };
+            }
 
-  //       groups[taxRateId].items.push(item);
-  //       groups[taxRateId].subtotal += item.total;
-  //       groups[taxRateId].tax = taxRate?.percentage ? (groups[taxRateId].subtotal * taxRate.percentage) / 100 : 0;
-  //     }
-  //   });
+            groups[taxRateId].items.push(item);
+            groups[taxRateId].subtotal += item.total;
+            groups[taxRateId].tax = taxRate?.percentage ? (groups[taxRateId].subtotal * taxRate.percentage) / 100 : 0;
+          }
+        });
 
-  //   return Object.values(groups);
-  // })();
+        return Object.values(groups);
+      })();
   return (
     <I18nProvider i18n={i18n}>
       <Document>
@@ -339,19 +341,21 @@ const InvoicePDF = ({
                     {getFormattedNumber(invoice.subTotal, invoice.currency, i18n.locale, organization)}
                   </Text>
                 </View>
-                {/* {taxGroups.map((group, index) => (
-                  <View
-                    key={`tax-${index}`}
-                    style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 4 }}
-                  >
-                    <Text style={[styles.smallText, styles.nowrap]}>
-                      {group.taxRate ? `${group.taxRate.name} ${group.taxRate.percentage}%` : <Trans>Tax 0%</Trans>}
-                    </Text>
-                    <Text style={[styles.smallText]}>
-                      {getFormattedNumber(group.tax, invoice.currency, i18n.locale, organization)}
-                    </Text>
-                  </View>
-                ))} */}
+                {organization?.taxesEnabled !== 0 && (
+                  taxGroups.map((group, index) => (
+                    <View
+                      key={`tax-${index}`}
+                      style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 4 }}
+                    >
+                      <Text style={[styles.smallText, styles.nowrap]}>
+                        {group.taxRate ? `${group.taxRate.name} ${group.taxRate.percentage}%` : <Trans>Tax 0%</Trans>}
+                      </Text>
+                      <Text style={[styles.smallText]}>
+                        {getFormattedNumber(group.tax, invoice.currency, i18n.locale, organization)}
+                      </Text>
+                    </View>
+                  ))
+                )}
               </View>
               <View
                 style={{
